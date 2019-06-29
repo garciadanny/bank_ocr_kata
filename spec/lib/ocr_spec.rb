@@ -60,4 +60,36 @@ describe OCR do
       end
     end
   end
+
+  describe '#account_number_results' do
+    let(:path) { document_path('use_case_03.txt') }
+    let(:ocr) { OCR.parse_document(path) }
+
+    context 'given a list of invalid bank account numbers' do
+      it 'prints the results with an error status' do
+        invalid_list = ocr.validated_account_numbers[:invalid]
+        results = ocr.account_number_results(:invalid, invalid_list)
+
+        expect(results).to eq "111111111 ERR\n"
+      end
+    end
+
+    context 'given a list of illegible bank account numbers' do
+      it 'prints the results with an illegible status' do
+        illegible_list = ocr.validated_account_numbers[:illegible]
+        results = ocr.account_number_results(:illegible, illegible_list)
+
+        expect(results).to eq "49006771? ILL\n1234?678? ILL\n"
+      end
+    end
+
+    context 'given a list of valid bank account numbers' do
+      it 'prints the valid account numbers' do
+        valid_list = ocr.validated_account_numbers[:valid]
+        results = ocr.account_number_results(:valid, valid_list)
+
+        expect(results).to eq "000000051\n"
+      end
+    end
+  end
 end

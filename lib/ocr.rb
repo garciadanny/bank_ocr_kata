@@ -4,17 +4,18 @@ require 'pry'
 class OCR
   include Glossary
 
-  attr_reader :document_path, :account_numbers
+  attr_reader :document_path, :account_numbers, :results_path
 
-  def self.parse_document(document_path)
-    instance = new(document_path)
+  def self.parse_document(document_path, results_path = nil)
+    instance = new(document_path, results_path)
     instance.parse_document
     instance
   end
 
-  def initialize(document_path)
+  def initialize(document_path, results_path)
     @document_path = document_path
     @account_numbers = []
+    @results_path = results_path
   end
 
   def parse_document
@@ -38,7 +39,6 @@ class OCR
     end
   end
 
-
   def validated_account_numbers
     validated = Hash.new { |hash, key| hash[key] = [] }
 
@@ -48,6 +48,25 @@ class OCR
     end
 
     validated
+  end
+
+  def print_results
+    File.open(results_path, 'w') do |f|
+      validated_account_numbers.each do |validity, list|
+        f.write account_number_results(validity, list)
+      end
+    end
+  end
+
+  def account_number_results(validity, list)
+    case validity
+    when :valid
+      list.each { |number| number.concat("\n") }
+    when :invalid
+      list.each { |number| number.concat(" ERR\n") }
+    else
+      list.each { |number| number.concat(" ILL\n") }
+    end.join("")
   end
 
   private def account_digit_lookup(number)
