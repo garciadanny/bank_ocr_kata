@@ -1,5 +1,4 @@
 require_relative './glossary'
-require 'pry'
 
 class OCR
   include Glossary
