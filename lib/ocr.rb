@@ -26,16 +26,57 @@ class OCR
       sec1.chomp!
       sec2.chomp!
       sec3.chomp!
-      
+
       while sec1.length > 0
         num_string << sec1.slice!(0,3)
         num_string << sec2.slice!(0,3)
         num_string << sec3.slice!(0,3)
-        account_number << glossary[num_string]
+        account_number << account_digit_lookup(num_string)
         num_string = ''
       end
       @account_numbers << account_number
     end
   end
 
+
+  def validated_account_numbers
+    validated = Hash.new { |hash, key| hash[key] = [] }
+
+    account_numbers.each do |account_number|
+      validity = account_number_validity(account_number)
+      validated[validity] << account_number
+    end
+
+    validated
+  end
+
+  private def account_digit_lookup(number)
+    digit = glossary[number]
+    if digit.nil?
+      "?"
+    else
+      digit
+    end
+  end
+
+  private def account_number_validity(account_number)
+    if account_number.include?("?")
+      :illegible
+    elsif valid_account_number?(account_number)
+      :valid
+    else
+      :invalid
+    end
+  end
+
+  private def valid_account_number?(account_number)
+    nums = account_number.split('').map(&:to_i).reverse
+    sum = 0
+    nums.each_with_index do |num, index|
+      sum += num * (index + 1)
+    end
+
+    sum % 11 == 0
+  end
 end
+
