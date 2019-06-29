@@ -1,5 +1,7 @@
 # Bank OCR Kata
 
+Instructions can be found [here](https://github.com/testdouble/contributing-tests/wiki/Bank-OCR-kata).
+
 ### User Story 1
 
 The first user story covers reading documents with bank account numbers into a
